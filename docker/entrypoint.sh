@@ -356,7 +356,7 @@ prepare_runtime_layout() {
   migrate_profile_ssh_keys
   warn_non_persistent_profile_paths
 
-  chown -R hermes:hermes /home/hermes /home/hermeswebui "$HERMES_HOME" "$HERMES_WORKSPACE" "$HERMES_RUNTIME_DIR" "$HERMES_USER_BIN_DIR" "$HERMES_USER_SSH_DIR"
+  chown -R hermes:hermes /home/hermes /home/hermeswebui "$HERMES_HOME" "$HERMES_WORKSPACE" "$HERMES_USER_BIN_DIR" "$HERMES_USER_SSH_DIR"
   chmod 755 /home/hermes /home/hermeswebui
   chmod 700 "$HERMES_USER_SSH_DIR"
   if [[ -f "$HERMES_HOME/config.yaml" ]]; then
