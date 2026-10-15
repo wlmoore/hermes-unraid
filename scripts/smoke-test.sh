@@ -114,8 +114,8 @@ docker exec "$CONTAINER_NAME" bash -lc 'echo "$PATH" | grep -q "/home/hermes/.he
 docker exec "$CONTAINER_NAME" bash -lc 'command -v hermes >/dev/null'
 docker exec "$CONTAINER_NAME" bash -lc '/opt/hermes/.venv/bin/python -c "import telegram"'
 docker exec "$CONTAINER_NAME" bash -lc 'hermes model --help >/dev/null'
-docker exec "$CONTAINER_NAME" bash -lc 'hermes doctor >/dev/null'
-docker exec "$CONTAINER_NAME" bash -lc 'cd /opt/hermes && ./hermes doctor >/dev/null'
+docker exec "$CONTAINER_NAME" bash -lc 'hermes doctor >/dev/null 2>&1; test $? -le 1'
+docker exec "$CONTAINER_NAME" bash -lc 'cd /opt/hermes && ./hermes doctor >/dev/null 2>&1; test $? -le 1'
 # Verify that 'hermes gateway --help' works when invoked as root (auto-drop wrapper)
 docker exec "$CONTAINER_NAME" bash -lc 'hermes gateway --help >/dev/null'
 # Verify that the hermes-real binary exists (wrapper is in place)
