@@ -250,6 +250,32 @@ ensure_telegram_deps() {
   fi
 }
 
+refresh_dependency_environment() {
+  # Same step the official Hermes container runs in docker/stage2-hook.sh
+  # before services start. An image update replaces uv.lock under the
+  # generation recorded on the data volume. Without this rebuild, boot
+  # warns and can run the new code on a generation built for the previous image.
+  local python="$VIRTUAL_ENV/bin/python"
+  if [[ ! -x "$python" ]]; then
+    log "Warning: dependency refresh skipped; $python is missing"
+    return 0
+  fi
+  log "Refreshing dependency environment against the image lock"
+  if ! gosu hermes "$python" -c '
+from pathlib import Path
+from hermes_cli.runtime_state import collect_generations
+from pm.environments import install_state_dir
+from pm.recovery import refresh_dependencies
+from pm.runtime import collect_runtime_generations
+root = Path("'"$INSTALL_DIR"'")
+print("[hermes-suite] dependency environment:", refresh_dependencies(root))
+removed = collect_generations(root) + collect_runtime_generations(install_state_dir(root) / "pm-runtime")
+print("[hermes-suite] collected", len(removed), "unused dependency generations")
+'; then
+    log "Warning: dependency refresh failed; continuing"
+  fi
+}
+
 configure_gateway_defaults() {
   # Default to allowing all gateway users when no platform-specific allowlists
   # (e.g. TELEGRAM_ALLOWED_USERS) are configured, suppressing the
@@ -439,6 +465,7 @@ prepare_runtime_layout
 bootstrap_home
 ensure_api_server_key
 configure_gateway_defaults
+refresh_dependency_environment
 ensure_telegram_deps
 
 log "Gateway API auth configured with a ${#API_SERVER_KEY}-character key"
