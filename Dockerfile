@@ -45,6 +45,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && test -x /usr/bin/tini
 
+COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /uvx /bin/
+
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 RUN if ! getent group hermeswebui >/dev/null; then groupadd -g 10001 hermeswebui; fi \
